@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Builder - FreedomFoundry</title>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- JSZip for downloading assets -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Tailwind CSS -->
+    <link href="../assets/css/output.css" rel="stylesheet">
+
+    <!-- Custom JS -->
+    <script defer src="../assets/js/main.js"></script>
+    <script defer src="../assets/js/auth.js"></script>
+    <style> [x-cloak] { display: none !important; } </style>
+</head>
+<body class="bg-light-gray">
+    <div class="flex h-screen bg-gray-100 font-sans">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-md hidden sm:block">
+            <div class="p-6">
+                <a href="/" class="flex items-center space-x-2">
+                    <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 16v-2m4-12h2M6 8H4m14 8h2M6 16H4m4-14v2m0 12v2M8 6V4m8 14v2M8 18H6m10 0h2m-5-14v2m0 12v2m-4-12h2m-2 12h2"></path></svg>
+                    <span class="font-bold text-xl text-neutral-800">FreedomFoundry</span>
+                </a>
+            </div>
+            <nav class="mt-6">
+                <a href="/app/" class="block py-2.5 px-4 text-gray-600 hover:bg-gray-200">Dashboard</a>
+                <a href="/app/onboarding.html" class="block py-2.5 px-4 bg-blue-100 text-primary rounded-r-lg font-semibold">New Project</a>
+                <a href="/app/referrals.html" class="block py-2.5 px-4 text-gray-600 hover:bg-gray-200">Referral Program</a>
+                <a href="/app/liberty101.html" class="block py-2.5 px-4 text-gray-600 hover:bg-gray-200">Liberty 101 Course</a>
+                <a href="/app/settings.html" class="block py-2.5 px-4 text-gray-600 hover:bg-gray-200">Settings</a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-6 bg-white border-b">
+                <h1 class="text-2xl font-bold text-neutral-800">One-Click Product Builder</h1>
+                <div><button @click="handleLogout()" class="text-gray-600 hover:text-primary font-semibold">Logout</button></div>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-light-gray p-6" x-data="productBuilder()">
+                <div class="container mx-auto">
+                    <div class="bg-white p-8 rounded-lg shadow max-w-4xl mx-auto">
+
+                        <!-- Step 1: Venture Info -->
+                        <div>
+                            <h2 class="text-2xl font-bold text-primary" x-text="venture.title"></h2>
+                            <p class="text-gray-600 mt-2" x-text="venture.description"></p>
+                        </div>
+
+                        <hr class="my-8">
+
+                        <!-- Step 2: Asset Generation -->
+                        <div class="space-y-8">
+                            <!-- Logo Generator -->
+                            <div class="flex items-start space-x-6">
+                                <div class="flex-shrink-0 w-32 h-32 bg-gray-200 rounded-lg flex items-center justify-center">
+                                    <img x-show="generated.logoUrl" :src="generated.logoUrl" class="w-full h-full object-cover rounded-lg">
+                                    <div x-show="!generated.logoUrl && !loading.logo" class="text-gray-500 text-sm text-center">Logo Preview</div>
+                                    <div x-show="loading.logo" class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                </div>
+                                <div class="flex-grow">
+                                    <h3 class="text-lg font-semibold">Generate Your Logo</h3>
+                                    <p class="text-sm text-gray-500 mb-2">Describe the logo you want. Simple is often best.</p>
+                                    <input type="text" x-model="prompts.logo" placeholder="e.g., a minimalist wolf head, geometric style" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                    <button @click="generateLogo" :disabled="loading.logo" class="mt-2 bg-primary text-white font-semibold px-4 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400">
+                                        <span x-show="!loading.logo">Generate Logo</span>
+                                        <span x-show="loading.logo">Generating...</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Landing Page Generator -->
+                            <div>
+                                <h3 class="text-lg font-semibold">Generate Your Landing Page</h3>
+                                <p class="text-sm text-gray-500 mb-2">The AI will create a complete, responsive landing page based on your venture.</p>
+                                <button @click="generateLandingPage" :disabled="loading.page" class="bg-primary text-white font-semibold px-4 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400">
+                                    <span x-show="!loading.page">Generate Page</span>
+                                    <span x-show="loading.page">Generating...</span>
+                                </button>
+                                <div x-show="generated.landingPageHtml" x-cloak class="mt-4 border rounded-lg p-4 bg-gray-50">
+                                    <h4 class="font-semibold">Landing Page Preview</h4>
+                                    <iframe :srcdoc="generated.landingPageHtml" class="w-full h-64 mt-2 border"></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Social Posts Generator -->
+                            <div>
+                                <h3 class="text-lg font-semibold">Generate Your Social Media Posts</h3>
+                                <p class="text-sm text-gray-500 mb-2">Create announcement posts for Twitter/X and LinkedIn.</p>
+                                <button @click="generateSocialPosts" :disabled="loading.social" class="bg-primary text-white font-semibold px-4 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400">
+                                    <span x-show="!loading.social">Generate Posts</span>
+                                    <span x-show="loading.social">Generating...</span>
+                                </button>
+                                <div x-show="generated.socialPosts" x-cloak class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="border rounded-lg p-4 bg-gray-50">
+                                        <h4 class="font-semibold">Twitter/X Post</h4>
+                                        <textarea readonly class="w-full h-32 mt-2 text-sm bg-white border-gray-300 rounded-md" x-text="generated.socialPosts?.twitter"></textarea>
+                                    </div>
+                                    <div class="border rounded-lg p-4 bg-gray-50">
+                                        <h4 class="font-semibold">LinkedIn Post</h4>
+                                        <textarea readonly class="w-full h-32 mt-2 text-sm bg-white border-gray-300 rounded-md" x-text="generated.socialPosts?.linkedin"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-8">
+
+                        <!-- Step 3: Download -->
+                        <div>
+                            <h2 class="text-xl font-semibold">Download Your Launch Kit</h2>
+                            <p class="text-gray-600 mb-4">Your generated assets will be packaged into a single .zip file, ready for launch.</p>
+                            <button @click="downloadZip" :disabled="!generated.logoUrl || !generated.landingPageHtml || !generated.socialPosts" class="w-full bg-secondary hover:bg-yellow-400 text-neutral-800 font-bold px-6 py-3 rounded-lg shadow-md transition disabled:bg-gray-300 disabled:cursor-not-allowed">
+                                Download Launch Kit (.zip)
+                            </button>
+                            <div x-show="error" x-cloak class="mt-4 text-sm text-center text-red-600" x-text="error"></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+    function productBuilder() {
+        return {
+            // This would normally be passed from the previous page
+            venture: {
+                title: 'AI-Powered Newsletter for Vintage Guitar Amps',
+                description: 'A weekly deep-dive newsletter for enthusiasts of vintage guitar amplifiers, featuring history, technical analysis, and market trends, all curated and partially written by AI.',
+            },
+            prompts: {
+                logo: 'a minimalist logo of a vacuum tube combined with a guitar pick, vector style',
+            },
+            loading: {
+                logo: false,
+                page: false,
+                social: false,
+            },
+            generated: {
+                logoUrl: null,
+                landingPageHtml: null,
+                socialPosts: null,
+            },
+            apiKeys: {},
+            error: '',
+
+            init() {
+                const storedKeys = localStorage.getItem('freedomfoundry_api_keys');
+                if (storedKeys) this.apiKeys = JSON.parse(storedKeys);
+
+                const selectedVenture = localStorage.getItem('selectedVenture');
+                if(selectedVenture) this.venture = JSON.parse(selectedVenture);
+            },
+
+            async _callOpenAI(prompt, model = 'gpt-3.5-turbo', jsonResponse = false) {
+                const apiKey = this.apiKeys.openai;
+                if (!apiKey) {
+                    this.error = "OpenAI API key not found in settings.";
+                    return null;
+                }
+                const body = {
+                    model: model,
+                    messages: [{ role: 'user', content: prompt }],
+                };
+                if (jsonResponse) {
+                    body.response_format = { type: "json_object" };
+                }
+
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+                    body: JSON.stringify(body)
+                });
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error.message);
+                }
+                return await response.json();
+            },
+
+            async generateLogo() {
+                this.loading.logo = true;
+                this.error = '';
+                try {
+                    const apiKey = this.apiKeys.openai;
+                    if (!apiKey) throw new Error("OpenAI API key not found.");
+
+                    const response = await fetch('https://api.openai.com/v1/images/generations', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                        body: JSON.stringify({
+                            prompt: this.prompts.logo,
+                            n: 1,
+                            size: '512x512',
+                            model: 'dall-e-3'
+                        })
+                    });
+                    if (!response.ok) {
+                        const err = await response.json();
+                        throw new Error(err.error.message);
+                    }
+                    const data = await response.json();
+                    this.generated.logoUrl = data.data[0].url;
+                } catch(e) { this.error = `Logo Generation Failed: ${e.message}`; }
+                finally { this.loading.logo = false; }
+            },
+
+            async generateLandingPage() {
+                this.loading.page = true;
+                this.error = '';
+                const prompt = `Create a complete, single-file HTML landing page for a new product.
+                    Product Name: "${this.venture.title}"
+                    Product Description: "${this.venture.description}"
+                    Instructions:
+                    - Use TailwindCSS for all styling. Link to the Tailwind CDN.
+                    - Create a premium, modern, and clean design.
+                    - Include these sections: Hero with a headline and signup form, Features/Benefits, About the Product, and a simple Footer.
+                    - The entire output must be a single, valid HTML file. Do not include any text or explanation outside of the HTML code block.`;
+                try {
+                    const data = await this._callOpenAI(prompt, 'gpt-4o');
+                    this.generated.landingPageHtml = data.choices[0].message.content.replace(/```html|```/g, '').trim();
+                } catch(e) { this.error = `Landing Page Generation Failed: ${e.message}`; }
+                finally { this.loading.page = false; }
+            },
+
+            async generateSocialPosts() {
+                this.loading.social = true;
+                this.error = '';
+                const prompt = `Create two social media posts to announce a new product.
+                    Product Name: "${this.venture.title}"
+                    Product Description: "${this.venture.description}"
+                    Instructions:
+                    1. Write a short, punchy post for Twitter/X (max 280 chars). Include 2-3 relevant hashtags.
+                    2. Write a slightly longer, more professional post for LinkedIn.
+                    Return the response as a single, valid JSON object with two keys: "twitter" and "linkedin".`;
+                try {
+                    const data = await this._callOpenAI(prompt, 'gpt-3.5-turbo', true);
+                    this.generated.socialPosts = JSON.parse(data.choices[0].message.content);
+                } catch(e) { this.error = `Social Post Generation Failed: ${e.message}`; }
+                finally { this.loading.social = false; }
+            },
+
+            async downloadZip() {
+                this.error = '';
+                try {
+                    const zip = new JSZip();
+
+                    // 1. Add Landing Page
+                    zip.file("index.html", this.generated.landingPageHtml);
+
+                    // 2. Add Social Posts
+                    const socialContent = `Twitter/X Post:\n${this.generated.socialPosts.twitter}\n\nLinkedIn Post:\n${this.generated.socialPosts.linkedin}`;
+                    zip.file("social_posts.txt", socialContent);
+
+                    // 3. Add Logo Image
+                    // We need to fetch the image data from the proxy URL as a blob
+                    const response = await fetch(this.generated.logoUrl);
+                    if (!response.ok) throw new Error("Could not fetch logo image for zipping.");
+                    const logoBlob = await response.blob();
+                    zip.file("logo.png", logoBlob);
+
+                    // Generate and download the zip file
+                    zip.generateAsync({type:"blob"}).then(function(content) {
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(content);
+                        link.download = "freedomfoundry_launch_kit.zip";
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    });
+
+                } catch (e) {
+                    this.error = `Failed to create ZIP file: ${e.message}`;
+                }
+            }
+        }
+    }
+    </script>
+</body>
+</html>

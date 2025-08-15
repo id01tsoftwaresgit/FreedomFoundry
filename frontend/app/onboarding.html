@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Project - FreedomFoundry</title>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/marked@12.0.2/lib/marked.umd.js"></script>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Tailwind CSS -->
+    <link href="../assets/css/output.css" rel="stylesheet">
+
+    <!-- Custom JS -->
+    <script defer src="../assets/js/main.js"></script>
+    <script defer src="../assets/js/auth.js"></script>
+    <style> [x-cloak] { display: none !important; } </style>
+</head>
+<body class="bg-light-gray">
+    <div class="flex h-screen bg-gray-100 font-sans">
+
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-md hidden sm:block">
+            <div class="p-6">
+                <a href="/" class="flex items-center space-x-2">
+                    <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 16v-2m4-12h2M6 8H4m14 8h2M6 16H4m4-14v2m0 12v2M8 6V4m8 14v2M8 18H6m10 0h2m-5-14v2m0 12v2m-4-12h2m-2 12h2"></path></svg>
+                    <span class="font-bold text-xl text-neutral-800">FreedomFoundry</span>
+                </a>
+            </div>
+            <nav class="mt-6">
+                <a href="/app/" class="block py-2.5 px-4 text-gray-600 hover:bg-gray-200">Dashboard</a>
+                <a href="/app/onboarding.html" class="block py-2.5 px-4 bg-blue-100 text-primary rounded-r-lg font-semibold">New Project</a>
+                <a href="/app/referrals.html" class="block py-2.5 px-4 text-gray-600 hover:bg-gray-200">Referral Program</a>
+                <a href="/app/liberty101.html" class="block py-2.5 px-4 text-gray-600 hover:bg-gray-200">Liberty 101 Course</a>
+                <a href="/app/settings.html" class="block py-2.5 px-4 text-gray-600 hover:bg-gray-200">Settings</a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-6 bg-white border-b">
+                <h1 class="text-2xl font-bold text-neutral-800">Venture Idea Engine</h1>
+                <div><button @click="handleLogout()" class="text-gray-600 hover:text-primary font-semibold">Logout</button></div>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-light-gray p-6" x-data="ventureEngine()">
+                <div class="container mx-auto">
+                    <!-- Step 1: Input Form -->
+                    <div x-show="!loading && ideas.length === 0" class="bg-white p-8 rounded-lg shadow max-w-3xl mx-auto">
+                        <h2 class="text-xl font-semibold mb-2">Let's Find Your Next Venture</h2>
+                        <p class="text-gray-600 mb-6">Tell the AI about your interests and skills. The more detail, the better the ideas.</p>
+
+                        <form @submit.prevent="generateIdeas">
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="skills" class="block text-sm font-medium text-gray-700">What are your skills?</label>
+                                    <input type="text" x-model="userInput.skills" id="skills" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm" placeholder="e.g., copywriting, graphic design, programming, gardening">
+                                </div>
+                                <div>
+                                    <label for="passions" class="block text-sm font-medium text-gray-700">What are your passions or hobbies?</label>
+                                    <input type="text" x-model="userInput.passions" id="passions" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm" placeholder="e.g., vintage synths, sustainable living, historical fiction">
+                                </div>
+                                <div>
+                                    <label for="time" class="block text-sm font-medium text-gray-700">How much time can you commit per week?</label>
+                                    <select x-model="userInput.time" id="time" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                                        <option>1-5 hours</option>
+                                        <option>5-10 hours</option>
+                                        <option>10+ hours</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="llm_provider" class="block text-sm font-medium text-gray-700">Which AI model do you want to use?</label>
+                                    <select x-model="selectedProvider" id="llm_provider" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                                        <option value="openai">OpenAI (GPT-4/3.5)</option>
+                                        <option value="anthropic" disabled>Anthropic (Coming Soon)</option>
+                                        <option value="gemini" disabled>Google Gemini (Coming Soon)</option>
+                                        <option value="ollama" disabled>Ollama (Local) (Coming Soon)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-6">
+                                <button type="submit" class="w-full bg-primary hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-lg shadow-md transition">
+                                    Generate My Ideas
+                                </button>
+                                <div x-show="error" x-cloak class="mt-4 text-sm text-center text-red-600" x-text="error"></div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Step 2: Loading State -->
+                    <div x-show="loading" x-cloak class="text-center py-20">
+                        <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto"></div>
+                        <h3 class="mt-6 text-xl font-semibold text-gray-700">AI is thinking...</h3>
+                        <p class="text-gray-500">Crafting some brilliant ideas based on your genius. This can take up to 30 seconds.</p>
+                    </div>
+
+                    <!-- Step 3: Results -->
+                    <div x-show="ideas.length > 0" x-cloak class="max-w-5xl mx-auto">
+                         <div class="text-center mb-10">
+                            <h2 class="text-3xl font-bold">Here Are Your AI-Generated Ventures</h2>
+                            <p class="text-gray-600 mt-2">Choose one to build out, or start over with new inputs.</p>
+                         </div>
+                        <div class="grid md:grid-cols-3 gap-8">
+                            <template x-for="(idea, index) in ideas" :key="index">
+                                <div class="bg-white rounded-lg shadow p-6 flex flex-col">
+                                    <h3 class="text-xl font-bold text-primary" x-text="idea.title"></h3>
+                                    <p class="text-gray-600 mt-2 flex-grow" x-text="idea.description"></p>
+
+                                    <div class="mt-6">
+                                        <h4 class="font-semibold">Pros:</h4>
+                                        <ul class="list-disc list-inside text-sm text-gray-600">
+                                            <template x-for="pro in idea.pros"><li x-text="pro"></li></template>
+                                        </ul>
+                                    </div>
+                                    <div class="mt-4">
+                                        <h4 class="font-semibold">Cons:</h4>
+                                        <ul class="list-disc list-inside text-sm text-gray-600">
+                                            <template x-for="con in idea.cons"><li x-text="con"></li></template>
+                                        </ul>
+                                    </div>
+                                    <div class="mt-4 text-sm space-y-2">
+                                        <p><strong>Revenue Potential:</strong> <span x-text="idea.revenue_potential"></span></p>
+                                        <p><strong>Difficulty:</strong> <span x-text="idea.difficulty"></span></p>
+                                    </div>
+                                    <div class="mt-6">
+                                       <h4 class="font-semibold">Suggested Next Steps:</h4>
+                                       <div class="prose prose-sm mt-2" x-html="marked.parse(idea.next_steps)"></div>
+                                    </div>
+
+                                    <button @click="selectVenture(idea)" class="mt-6 w-full bg-secondary hover:bg-yellow-400 text-neutral-800 font-bold py-2 px-4 rounded-lg transition">
+                                        Build This Venture &rarr;
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="text-center mt-12">
+                            <button @click="reset" class="text-gray-600 hover:text-primary font-semibold">
+                                &larr; Start Over With New Inputs
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+    function ventureEngine() {
+        return {
+            userInput: { skills: '', passions: '', time: '5-10 hours' },
+            selectedProvider: 'openai',
+            loading: false,
+            error: '',
+            ideas: [],
+            apiKeys: {},
+
+            init() {
+                const storedKeys = localStorage.getItem('freedomfoundry_api_keys');
+                if (storedKeys) {
+                    this.apiKeys = JSON.parse(storedKeys);
+                }
+            },
+
+            async generateIdeas() {
+                this.error = '';
+                const apiKey = this.apiKeys[this.selectedProvider];
+
+                if (!apiKey) {
+                    this.error = `API key for ${this.selectedProvider} not found. Please add it in Settings.`;
+                    return;
+                }
+
+                if (!this.userInput.skills || !this.userInput.passions) {
+                    this.error = 'Please tell us about your skills and passions.';
+                    return;
+                }
+
+                this.loading = true;
+                this.ideas = [];
+
+                const prompt = this.constructPrompt();
+
+                try {
+                    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${apiKey}`
+                        },
+                        body: JSON.stringify({
+                            model: 'gpt-3.5-turbo',
+                            messages: [{ role: 'user', content: prompt }],
+                            response_format: { type: "json_object" }
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error.message || `API request failed with status ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    const content = JSON.parse(data.choices[0].message.content);
+
+                    if (content.ideas && Array.isArray(content.ideas) && content.ideas.length > 0) {
+                        this.ideas = content.ideas;
+                    } else {
+                        throw new Error("The AI returned an unexpected format. Please try again.");
+                    }
+
+                } catch (e) {
+                    console.error(e);
+                    this.error = `An error occurred: ${e.message}. Check your API key and network connection.`;
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            constructPrompt() {
+                return `
+                    Based on the following user profile, generate 3 distinct, monetizable micro-business or digital product ideas.
+
+                    User Profile:
+                    - Skills: ${this.userInput.skills}
+                    - Passions/Hobbies: ${this.userInput.passions}
+                    - Time Commitment: ${this.userInput.time} per week
+
+                    For each idea, provide the following information:
+                    - title: A catchy and descriptive name for the venture.
+                    - description: A one or two-sentence summary of the business idea.
+                    - pros: An array of 2-3 key advantages or positive aspects.
+                    - cons: An array of 2-3 potential challenges or downsides.
+                    - revenue_potential: A realistic estimated monthly revenue range (e.g., "$50-$200/month", "$500-$1500/month").
+                    - difficulty: A simple difficulty rating (e.g., "Easy", "Medium", "Hard").
+                    - next_steps: A markdown-formatted string with 3-4 concrete, actionable first steps to get started.
+
+                    IMPORTANT: Return the response as a single, valid JSON object with a key "ideas" which is an array of the 3 generated idea objects. Do not include any other text or explanation outside of the JSON object.
+                `;
+            },
+
+            reset() {
+                this.ideas = [];
+                this.userInput = { skills: '', passions: '', time: '5-10 hours' };
+                this.error = '';
+            },
+
+            selectVenture(idea) {
+                // Save the selected idea to localStorage to pass it to the builder page
+                localStorage.setItem('selectedVenture', JSON.stringify(idea));
+                // Redirect to the builder page
+                window.location.href = '/app/builder.html';
+            }
+        }
+    }
+    </script>
+</body>
+</html>

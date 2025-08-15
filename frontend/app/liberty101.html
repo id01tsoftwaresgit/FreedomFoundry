@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liberty 101 Course - FreedomFoundry</title>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Tailwind CSS -->
+    <link href="../assets/css/output.css" rel="stylesheet">
+
+    <!-- Custom JS -->
+    <script defer src="../assets/js/main.js"></script>
+    <script defer src="../assets/js/auth.js"></script>
+    <style> [x-cloak] { display: none !important; } </style>
+</head>
+<body class="bg-light-gray">
+    <div class="flex h-screen bg-gray-100 font-sans">
+
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-md hidden sm:block">
+            <div class="p-6">
+                <a href="/" class="flex items-center space-x-2">
+                    <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 16v-2m4-12h2M6 8H4m14 8h2M6 16H4m4-14v2m0 12v2M8 6V4m8 14v2M8 18H6m10 0h2m-5-14v2m0 12v2m-4-12h2m-2 12h2"></path></svg>
+                    <span class="font-bold text-xl text-neutral-800">FreedomFoundry</span>
+                </a>
+            </div>
+            <nav class="mt-6">
+                <a href="/app/" class="block py-2.5 px-4 text-gray-600 hover:bg-gray-200">Dashboard</a>
+                <a href="/app/onboarding.html" class="block py-2.5 px-4 text-gray-600 hover:bg-gray-200">New Project</a>
+                <a href="/app/referrals.html" class="block py-2.5 px-4 text-gray-600 hover:bg-gray-200">Referral Program</a>
+                <a href="/app/liberty101.html" class="block py-2.5 px-4 bg-blue-100 text-primary rounded-r-lg font-semibold">Liberty 101 Course</a>
+                <a href="/app/settings.html" class="block py-2.5 px-4 text-gray-600 hover:bg-gray-200">Settings</a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-6 bg-white border-b">
+                <h1 class="text-2xl font-bold text-neutral-800">Liberty 101: The Path to Full Independence</h1>
+                <div><button @click="handleLogout()" class="text-gray-600 hover:text-primary font-semibold">Logout</button></div>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-light-gray p-6">
+                <div class="container mx-auto">
+                    <div class="bg-white p-8 rounded-lg shadow max-w-4xl mx-auto">
+                        <div class="text-center">
+                            <span class="text-secondary font-bold uppercase">The Ultimate Freedom Accelerator</span>
+                            <h2 class="text-3xl md:text-4xl font-bold mt-2 text-neutral-800">Scale Your Income, Not Your Workload.</h2>
+                            <p class="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">
+                                You've built your first income stream with FreedomFoundry. Now, learn the systems and mindset to multiply your success, automate your growth, and achieve true financial sovereignty.
+                            </p>
+                        </div>
+
+                        <hr class="my-10">
+
+                        <div>
+                            <h3 class="text-2xl font-bold text-center mb-6">Free Mini-Lesson: The 5-Hour Freedom Week</h3>
+                            <div class="aspect-w-16 aspect-h-9 bg-gray-200 rounded-lg mb-4">
+                                <!-- Placeholder for an embedded video -->
+                                <div class="flex items-center justify-center h-full">
+                                    <p class="text-gray-500">Video coming soon...</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-700">
+                                In this exclusive preview from the Liberty 101 course, you'll discover the core concept of "leverage-stacking" that allows top-tier creators to build and manage a portfolio of income streams in just a few hours per week. Learn how to design systems that work for you, so you don't have to.
+                            </p>
+                        </div>
+
+                        <div class="mt-10 text-center">
+                            <a href="#" class="bg-secondary hover:bg-yellow-400 text-neutral-800 font-bold text-lg px-8 py-4 rounded-lg shadow-xl hover:shadow-2xl transition transform hover:-translate-y-1">
+                                Yes, I Want to Accelerate My Freedom! (Enroll Now)
+                            </a>
+                            <p class="text-sm text-gray-500 mt-2">(This will link to the external course sales page)</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

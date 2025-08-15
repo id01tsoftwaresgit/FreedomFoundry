@@ -1,0 +1,27 @@
+# Python / FastAPI
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.env.*
+!/.env.example
+
+# Node / Frontend
+node_modules/
+dist/
+build/
+.DS_Store
+
+# IDE / Editor specific
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Misc
+.DS_Store
+*.log

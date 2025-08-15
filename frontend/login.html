@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - FreedomFoundry</title>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Tailwind CSS -->
+    <link href="./assets/css/output.css" rel="stylesheet">
+
+    <!-- Custom Auth Logic -->
+    <script defer src="./assets/js/auth.js"></script>
+
+    <style> [x-cloak] { display: none !important; } </style>
+</head>
+<body class="bg-light-gray">
+
+    <div class="min-h-screen flex flex-col items-center justify-center py-12">
+        <a href="/" class="flex items-center space-x-2 mb-8">
+            <svg class="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 16v-2m4-12h2M6 8H4m14 8h2M6 16H4m4-14v2m0 12v2M8 6V4m8 14v2M8 18H6m10 0h2m-5-14v2m0 12v2m-4-12h2m-2 12h2"></path></svg>
+            <span class="font-bold text-3xl text-neutral-800">FreedomFoundry</span>
+        </a>
+
+        <div class="w-full max-w-md bg-white rounded-lg shadow-md p-8" x-data="authForm()">
+            <div x-show="isSignUp">
+                <h2 class="text-2xl font-bold text-center text-neutral-800">Create Your Free Account</h2>
+                <p class="text-center text-gray-600 mt-2">
+                    Or <button @click="isSignUp = false" class="font-medium text-primary hover:text-blue-700">log in to your existing account</button>
+                </p>
+            </div>
+            <div x-show="!isSignUp">
+                <h2 class="text-2xl font-bold text-center text-neutral-800">Welcome Back</h2>
+                <p class="text-center text-gray-600 mt-2">
+                    Or <button @click="isSignUp = true" class="font-medium text-primary hover:text-blue-700">create a new account</button>
+                </p>
+            </div>
+
+            <form @submit.prevent="isSignUp ? handleSignUp() : handleLogin()" class="mt-8 space-y-6">
+                <div x-show="error" x-cloak class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md" x-text="error"></div>
+                <div x-show="message" x-cloak class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-md" x-text="message"></div>
+
+                <div class="rounded-md shadow-sm -space-y-px">
+                    <div>
+                        <label for="email-address" class="sr-only">Email address</label>
+                        <input id="email-address" x-model="email" name="email" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm" placeholder="Email address">
+                    </div>
+                    <div>
+                        <label for="password" class="sr-only">Password</label>
+                        <input id="password" x-model="password" name="password" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm" placeholder="Password">
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" :disabled="loading" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:bg-gray-400">
+                        <span x-show="loading" class="absolute left-0 inset-y-0 flex items-center pl-3">
+                            <svg class="h-5 w-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        </span>
+                        <span x-text="isSignUp ? 'Create Account' : 'Sign In'"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // This Alpine component is specific to the login/signup form.
+        function authForm() {
+            return {
+                isSignUp: true,
+                email: '',
+                password: '',
+                loading: false,
+                error: '',
+                message: '',
+                referrerId: null,
+
+                init() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    this.referrerId = urlParams.get('ref');
+                    if (this.referrerId) {
+                        console.log(`Referrer ID found: ${this.referrerId}`);
+                    }
+                },
+
+                async handleSignUp() {
+                    if (!window.supabase) { this.error = "Supabase client not initialized."; return; }
+                    this.loading = true;
+                    this.error = '';
+                    this.message = '';
+
+                    const signUpData = {
+                        email: this.email,
+                        password: this.password,
+                    };
+
+                    if (this.referrerId) {
+                        signUpData.options = {
+                            data: {
+                                referrer_id: this.referrerId
+                            }
+                        }
+                    }
+
+                    const { data, error } = await window.supabase.auth.signUp(signUpData);
+                    if (error) {
+                        this.error = error.message;
+                    } else if (data.user && data.user.identities && data.user.identities.length === 0) {
+                        this.error = 'User with this email already exists. Please log in.';
+                        this.isSignUp = false;
+                    }
+                    else {
+                        this.message = 'Success! Please check your email to confirm your account.';
+                    }
+                    this.loading = false;
+                },
+
+                async handleLogin() {
+                    if (!window.supabase) { this.error = "Supabase client not initialized."; return; }
+                    this.loading = true;
+                    this.error = '';
+                    this.message = '';
+                    const { data, error } = await window.supabase.auth.signInWithPassword({
+                        email: this.email,
+                        password: this.password,
+                    });
+                    if (error) {
+                        this.error = error.message;
+                    } else {
+                        // The onAuthStateChange listener in auth.js will handle the redirect.
+                        this.message = 'Login successful! Redirecting...';
+                    }
+                    this.loading = false;
+                }
+            }
+        }
+    </script>
+</body>
+</html>

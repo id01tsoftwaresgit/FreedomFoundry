@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to FreedomFoundry</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; margin: 0; padding: 0; background-color: #f3f4f6; }
+        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+        .header { background-color: #1E40AF; color: #ffffff; padding: 40px; text-align: center; }
+        .header h1 { margin: 0; font-size: 28px; }
+        .content { padding: 40px; color: #1f2937; line-height: 1.6; }
+        .content h2 { font-size: 22px; color: #111827; margin-top: 0; }
+        .content p { margin: 16px 0; }
+        .button { display: inline-block; background-color: #FBBF24; color: #1f2937; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 20px; }
+        .footer { background-color: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #6b7280; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Welcome to FreedomFoundry!</h1>
+        </div>
+        <div class="content">
+            <h2>Your journey to independence starts now.</h2>
+            <p>
+                Hi {{ .User.email }},
+            </p>
+            <p>
+                Thank you for joining FreedomFoundry. We are thrilled to have you on board. You've just taken the most important step towards building a business that serves your life, not the other way around.
+            </p>
+            <p>
+                What's next? Your first mission, should you choose to accept it, is to use our AI to generate and build your first income stream. It takes less than an hour, and it might just change your life.
+            </p>
+            <a href="{{ .SiteURL }}/app/" class="button">Start My First Freedom Project</a>
+            <p style="margin-top: 30px;">
+                If you have any questions, just reply to this email. We're here to help you succeed.
+            </p>
+            <p>
+                To freedom,<br>
+                The FreedomFoundry Team
+            </p>
+        </div>
+        <div class="footer">
+            <p>FreedomFoundry &copy; 2024. All Rights Reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
