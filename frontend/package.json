@@ -1,0 +1,20 @@
+{
+  "name": "freedomfoundry-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for FreedomFoundry",
+  "main": "index.html",
+  "scripts": {
+    "build:css": "tailwindcss -i ./assets/css/style.css -o ./assets/css/output.css --watch"
+  },
+  "keywords": [
+    "saas",
+    "freedomfoundry",
+    "alpinejs",
+    "tailwindcss"
+  ],
+  "author": "FreedomFoundry",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "tailwindcss": "^3.4.1"
+  }
+}

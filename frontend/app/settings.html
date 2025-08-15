@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - FreedomFoundry</title>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Tailwind CSS -->
+    <link href="../assets/css/output.css" rel="stylesheet">
+
+    <!-- Custom JS -->
+    <script defer src="../assets/js/main.js"></script>
+    <script defer src="../assets/js/auth.js"></script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="bg-light-gray">
+    <div class="flex h-screen bg-gray-100 font-sans">
+
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-md hidden sm:block">
+            <div class="p-6">
+                <a href="/" class="flex items-center space-x-2">
+                    <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 16v-2m4-12h2M6 8H4m14 8h2M6 16H4m4-14v2m0 12v2M8 6V4m8 14v2M8 18H6m10 0h2m-5-14v2m0 12v2m-4-12h2m-2 12h2"></path></svg>
+                    <span class="font-bold text-xl text-neutral-800">FreedomFoundry</span>
+                </a>
+            </div>
+            <nav class="mt-6">
+                <a href="/app/" class="block py-2.5 px-4 text-gray-600 hover:bg-gray-200">Dashboard</a>
+                <a href="/app/onboarding.html" class="block py-2.5 px-4 text-gray-600 hover:bg-gray-200">New Project</a>
+                <a href="/app/referrals.html" class="block py-2.5 px-4 text-gray-600 hover:bg-gray-200">Referral Program</a>
+                <a href="/app/liberty101.html" class="block py-2.5 px-4 text-gray-600 hover:bg-gray-200">Liberty 101 Course</a>
+                <a href="/app/settings.html" class="block py-2.5 px-4 bg-blue-100 text-primary rounded-r-lg font-semibold">Settings</a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <header class="flex justify-between items-center p-6 bg-white border-b">
+                <h1 class="text-2xl font-bold text-neutral-800">API Key Settings</h1>
+                <div>
+                    <button @click="handleLogout()" class="text-gray-600 hover:text-primary font-semibold">Logout</button>
+                </div>
+            </header>
+
+            <!-- Content area -->
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-light-gray p-6">
+                <div class="container mx-auto max-w-2xl"
+                     x-data="apiSettings()"
+                     @submit.prevent="saveKeys">
+
+                    <div class="bg-white p-8 rounded-lg shadow">
+                        <h2 class="text-xl font-semibold mb-2">Connect Your AI Models</h2>
+                        <p class="text-gray-600 mb-6">
+                            Your API keys are stored securely in your browser's local storage and are never sent to our servers. This ensures your privacy and keeps your accounts secure.
+                        </p>
+
+                        <form class="space-y-6">
+                            <!-- OpenAI -->
+                            <div>
+                                <label for="openai_key" class="block text-sm font-medium text-gray-700">OpenAI API Key</label>
+                                <input type="password" id="openai_key" x-model="keys.openai" placeholder="sk-..." class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary">
+                            </div>
+
+                            <!-- Anthropic -->
+                            <div>
+                                <label for="anthropic_key" class="block text-sm font-medium text-gray-700">Anthropic (Claude) API Key</label>
+                                <input type="password" id="anthropic_key" x-model="keys.anthropic" placeholder="sk-ant-..." class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary">
+                            </div>
+
+                            <!-- Google Gemini -->
+                            <div>
+                                <label for="gemini_key" class="block text-sm font-medium text-gray-700">Google Gemini API Key</label>
+                                <input type="password" id="gemini_key" x-model="keys.gemini" placeholder="AIzaSy..." class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary">
+                            </div>
+
+                            <!-- Mistral -->
+                            <div>
+                                <label for="mistral_key" class="block text-sm font-medium text-gray-700">Mistral API Key</label>
+                                <input type="password" id="mistral_key" x-model="keys.mistral" placeholder="Your Mistral Key" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary">
+                            </div>
+
+                            <!-- Ollama (Local) -->
+                            <div>
+                                <label for="ollama_host" class="block text-sm font-medium text-gray-700">Ollama (Local) Host URL</label>
+                                <input type="text" id="ollama_host" x-model="keys.ollama" placeholder="http://localhost:11434" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary">
+                                <p class="mt-2 text-xs text-gray-500">For using models running locally on your machine via Ollama.</p>
+                            </div>
+
+                            <div class="flex items-center justify-end space-x-4">
+                                <span x-show="saved" x-transition class="text-sm text-green-600">Settings saved successfully!</span>
+                                <button type="submit" class="bg-primary hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition">
+                                    Save Settings
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        function apiSettings() {
+            return {
+                keys: {
+                    openai: '',
+                    anthropic: '',
+                    gemini: '',
+                    mistral: '',
+                    ollama: '',
+                },
+                saved: false,
+                init() {
+                    // Load existing keys from localStorage when the component initializes
+                    const storedKeys = localStorage.getItem('freedomfoundry_api_keys');
+                    if (storedKeys) {
+                        this.keys = { ...this.keys, ...JSON.parse(storedKeys) };
+                    }
+                    // Default Ollama host if not set
+                    if (!this.keys.ollama) {
+                        this.keys.ollama = 'http://localhost:11434';
+                    }
+                },
+                saveKeys() {
+                    // Save the keys to localStorage
+                    localStorage.setItem('freedomfoundry_api_keys', JSON.stringify(this.keys));
+                    this.saved = true;
+                    // Hide the "saved" message after 3 seconds
+                    setTimeout(() => {
+                        this.saved = false;
+                    }, 3000);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

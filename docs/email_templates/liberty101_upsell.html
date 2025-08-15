@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You've Built. Now, It's Time to Scale.</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; margin: 0; padding: 0; background-color: #f3f4f6; }
+        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+        .header { background-color: #111827; color: #ffffff; padding: 40px; text-align: center; }
+        .header h1 { margin: 0; font-size: 28px; }
+        .content { padding: 40px; color: #1f2937; line-height: 1.6; }
+        .content h2 { font-size: 22px; color: #111827; margin-top: 0; }
+        .content p { margin: 16px 0; }
+        .button { display: inline-block; background-color: #FBBF24; color: #1f2937; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 20px; }
+        .quote { margin-top: 30px; border-left: 4px solid #FBBF24; padding-left: 20px; font-style: italic; color: #4b5563; }
+        .footer { background-color: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #6b7280; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>The Next Step in Your Freedom Journey</h1>
+        </div>
+        <div class="content">
+            <h2>You've successfully launched. Congratulations!</h2>
+            <p>
+                Hi {{ .User.email }},
+            </p>
+            <p>
+                We saw that you used FreedomFoundry to build your new venture. That is a massive accomplishment, and you should be incredibly proud. You are already ahead of 99% of people who only dream of starting a business.
+            </p>
+            <p>
+                But now you might be asking: "What's next? How do I turn this small win into life-changing, sustainable income?"
+            </p>
+            <div class="quote">
+                <p>"Building one income stream gives you a taste of freedom. Building a *system* of income streams gives you the whole thing."</p>
+            </div>
+            <p>
+                That's why we created **Liberty 101**, the ultimate accelerator course for FreedomFoundry members. It's designed to give you the advanced mindset, strategies, and systems to scale your income streams and build lasting wealth.
+            </p>
+            <p>
+                In Liberty 101, you will learn:
+            </p>
+            <ul>
+                <li>How to automate and grow your first product so it runs without you.</li>
+                <li>How to stack multiple income streams without multiplying your workload.</li>
+                <li>The financial strategies to go from side-hustle income to full financial independence.</li>
+            </ul>
+            <a href="{{ .SiteURL }}/app/liberty101.html" class="button">Show Me The Path to Full Independence</a>
+            <p style="margin-top: 30px;">
+                You've already proven you can take action. Don't stop now.
+            </p>
+            <p>
+                To your future,<br>
+                The FreedomFoundry Team
+            </p>
+        </div>
+        <div class="footer">
+            <p>FreedomFoundry &copy; 2024. All Rights Reserved.</p>
+            <p><a href="{{ .UnsubscribeURL }}" style="color: #6b7280; text-decoration: underline;">Unsubscribe</a></p>
+        </div>
+    </div>
+</body>
+</html>
